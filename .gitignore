@@ -1,3 +1,3 @@
 input/*.xlsx
 input/*.csv
-scripts/*.json
+.claude/skills/bill-analyzer/scripts/*.json

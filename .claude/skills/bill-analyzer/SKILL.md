@@ -19,7 +19,7 @@ description: 分析支付宝/微信账单。将账单文件放入 input/ 目录�
 引导用户将用户将账单文件放入 `input/` 目录后，用户确认放入后执行：
 
 ```bash
-python3 scripts/parse_bill.py input/ -o cleaned_data.json
+python3 .claude/skills/bill-analyzer/scripts/parse_bill.py input/ -o cleaned_data.json
 ```
 
 脚本自动完成：
@@ -52,7 +52,7 @@ python3 scripts/parse_bill.py input/ -o cleaned_data.json
 ### Step 3: 多维分析
 
 ```bash
-python3 scripts/analyze_bill.py cleaned_data.json
+python3 .claude/skills/bill-analyzer/scripts/analyze_bill.py cleaned_data.json
 ```
 
 输出内容包括：
