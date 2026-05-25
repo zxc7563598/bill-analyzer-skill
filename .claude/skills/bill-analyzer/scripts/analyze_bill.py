@@ -82,8 +82,10 @@ def category_breakdown(data: list[dict], top_n: int = 8) -> list[dict]:
             others_amount += amount
 
     if others_amount > 0:
+        # 避免与已有分类名"其他"冲突
+        other_label = "其他分类" if "其他" in cats else "其他"
         result.append({
-            "category": "其他",
+            "category": other_label,
             "amount": round(others_amount, 2),
             "percent": round(others_amount / total * 100, 1) if total > 0 else 0,
         })
