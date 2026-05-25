@@ -3,7 +3,7 @@
 解析支付宝/微信账单（目录批量模式）。
 
 用法:
-  python3 parse_bill.py input/ [-o cleaned.json] [--mapping-dir scripts/]
+  python3 parse_bill.py <账单目录> [-o cleaned.json] [--mapping-dir references/]
 
 自动扫描目录下所有 csv/xlsx 文件，识别来源（支付宝/微信），自动检测表头行，
 过滤不计收支/中性交易/失败交易，标准化字段，应用商户映射和分类映射。
@@ -630,7 +630,7 @@ def main():
     parser = argparse.ArgumentParser(description="解析支付宝/微信账单（目录批量模式）")
     parser.add_argument("input_dir", help="账单文件所在目录路径")
     parser.add_argument("--output", "-o", default=None, help="输出 JSON 文件路径（默认输出到 stdout）")
-    parser.add_argument("--mapping-dir", "-m", default=None, help="映射文件目录（默认 scripts/）")
+    parser.add_argument("--mapping-dir", "-m", default=None, help="映射文件目录（默认 ../references/）")
     args = parser.parse_args()
 
     if not os.path.isdir(args.input_dir):
@@ -638,7 +638,7 @@ def main():
         sys.exit(1)
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    mapping_dir = args.mapping_dir or script_dir
+    mapping_dir = args.mapping_dir or os.path.join(os.path.dirname(script_dir), "references")
 
     result = parse_directory(args.input_dir, mapping_dir)
 

@@ -5,28 +5,33 @@ description: 分析支付宝/微信账单。将账单文件放入 input/ 目录�
 
 # 账单分析 Skill
 
-分析支付宝或微信导出的账单文件（xlsx/csv）。用户将账单文件放入 `input/` 目录后，依次运行解析和分析脚本，即可获得标准化的合并数据和多维度分析报告。
+分析支付宝或微信导出的账单文件（xlsx/csv）。依次运行解析和分析脚本，即可获得标准化的合并数据和多维度分析报告。
 
-## 脚本一览
+本 SKILL.md 所在目录记为 `{SKILL_DIR}`。执行命令时，将其替换为实际路径（如 `skills/bill-analyzer` 或 `~/.claude/skills/bill-analyzer`）。
+
+## 目录结构
 
 ```
-scripts/
-├── parse_bill.py                   # 批量解析 input/ → cleaned_data.json
-├── analyze_bill.py                 # 全维度分析 → Markdown/JSON 报告
-├── query_bill.py                   # 交互式查询（筛选/分组/排行）
-├── merchant_clean_mapping.json     # 原始商户名 → 标准化商户名
-├── category_mapping.json           # 标准化商户名 → 分类
-└── payment_method_mapping.json     # 原始支付方式 → 标准化支付方式
+{SKILL_DIR}/
+├── SKILL.md
+├── scripts/
+│   ├── parse_bill.py       # 批量解析账单 → cleaned_data.json
+│   ├── analyze_bill.py     # 全维度分析 → Markdown/JSON 报告
+│   └── query_bill.py       # 交互式查询（筛选/分组/排行）
+└── references/
+    ├── merchant_clean_mapping.json   # 原始商户名 → 标准化商户名
+    ├── category_mapping.json         # 标准化商户名 → 分类
+    └── payment_method_mapping.json   # 原始支付方式 → 标准化支付方式
 ```
 
 ## 工作流
 
 ### Step 1: 解析账单
 
-用户确认已将账单文件放入 `input/` 目录后，运行：
+用户提供账单文件所在目录（如 `~/Downloads/`、`./input/` 或任意路径），运行：
 
 ```bash
-python3 skills/bill-analyzer/scripts/parse_bill.py input/ -o /tmp/cleaned_data.json
+python3 {SKILL_DIR}/scripts/parse_bill.py <账单目录> -o /tmp/cleaned_data.json
 ```
 
 脚本自动完成：
@@ -35,16 +40,16 @@ python3 skills/bill-analyzer/scripts/parse_bill.py input/ -o /tmp/cleaned_data.j
 - 过滤无效交易：不计收支、中性交易、失败/退款交易
 - 按交易单号去重
 - 字段标准化为统一结构：date/merchant_raw/merchant_clean/category/type/amount/payment_method/source/description
-- 应用三个映射文件进行商户名清洗和分类归并
+- 应用 `references/` 下的三个映射文件进行商户名清洗和分类归并
 
 解析完成后向用户汇报：有效记录数、过滤记录数、新发现的商户（如有）。
 
-**映射积累**：脚本自动将新商户/分类/支付方式追加到映射文件。如果自动映射不准确，用户可直接编辑 `scripts/` 下的 JSON 文件，下次运行即生效。
+**映射积累**：脚本自动将新商户/分类/支付方式追加到映射文件。如果自动映射不准确，用户可直接编辑 `{SKILL_DIR}/references/` 下的 JSON 文件，下次运行即生效。
 
 ### Step 2: 全维度分析
 
 ```bash
-python3 skills/bill-analyzer/scripts/analyze_bill.py /tmp/cleaned_data.json
+python3 {SKILL_DIR}/scripts/analyze_bill.py /tmp/cleaned_data.json
 ```
 
 输出 Markdown 报告，包含：
@@ -65,34 +70,34 @@ python3 skills/bill-analyzer/scripts/analyze_bill.py /tmp/cleaned_data.json
 用户可能会问特定问题（"我上个月在餐饮上花了多少钱？""蜜雪冰城去了几次？""今年每个月的交通支出趋势？"），此时用 `query_bill.py` 直接查询，无需再走完整分析流程：
 
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json [选项]
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json [选项]
 ```
 
 **常用查询模式**：
 
 查看特定商户的消费明细：
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --merchant 蜜雪冰城
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json --merchant 蜜雪冰城
 ```
 
 查看某一分类的 Top N：
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --category 餐饮美食 --type expense --top 5 --group-by merchant
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json --category 餐饮美食 --type expense --top 5 --group-by merchant
 ```
 
 查看某时间段的月度趋势：
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --from 2026-01 --to 2026-05 --category 交通出行 --group-by month
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json --from 2026-01 --to 2026-05 --category 交通出行 --group-by month
 ```
 
 支付方式分布：
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --group-by payment --type expense
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json --group-by payment --type expense
 ```
 
 关键词模糊搜索：
 ```bash
-python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --keyword 房租
+python3 {SKILL_DIR}/scripts/query_bill.py /tmp/cleaned_data.json --keyword 房租
 ```
 
 **可用筛选条件**：`--type`（income/expense）、`--category`、`--merchant`、`--payment`、`--source`（alipay/wechat）、`--date-from`、`--date-to`、`--keyword`
@@ -122,4 +127,4 @@ python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --keyw
 - 检查 `openpyxl` 已安装：`pip3 install openpyxl`
 - 如果解析出错，查看 stderr 中的表头行检测信息
 - 支付宝 csv 乱码：脚本会自动尝试多种编码
-- 商户名大量未匹配：检查 `merchant_clean_mapping.json` 是否需要手动补充
+- 商户名大量未匹配：检查 `{SKILL_DIR}/references/merchant_clean_mapping.json` 是否需要手动补充
