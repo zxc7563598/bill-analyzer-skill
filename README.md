@@ -16,14 +16,14 @@
 ## 项目结构
 
 ```
-bill-analyzer-skill/
-├── .claude/skills/bill-analyzer/   # 技能目录
+.
+├── skills/                         # 技能目录
 │   ├── SKILL.md                    # 技能描述与工作流指引
 │   └── scripts/
 │       ├── parse_bill.py           # 批量解析 input/ → cleaned_data.json
 │       ├── analyze_bill.py         # 全维度分析 → Markdown/JSON 报告
 │       └── query_bill.py           # 交互式查询（筛选/分组/排行）
-├── input/                          # 放置账单文件的目录（已 gitignore）
+├── input/                          # 放置账单文件的目录
 ├── .gitignore
 └── LICENSE
 ```
@@ -47,19 +47,10 @@ bill-analyzer-skill/
 /add-skill https://github.com/zxc7563598/bill-analyzer-skill
 ```
 
-**方式二：手动安装**
+**方式二：通过 npx 安装**
 
 ```bash
-# 克隆仓库
-git clone https://github.com/zxc7563598/bill-analyzer-skill.git
-cd bill-analyzer-skill
-
-# 安装依赖
-pip3 install openpyxl
-
-# 将技能链接到 Claude Code
-mkdir -p ~/.claude/skills
-ln -s "$(pwd)/.claude/skills/bill-analyzer" ~/.claude/skills/bill-analyzer
+npx skills add https://github.com/zxc7563598/bill-analyzer-skill --skill bill-analyzer
 ```
 
 ## 使用

@@ -1,5 +1,5 @@
 input/*.xlsx
 input/*.csv
-.claude/skills/bill-analyzer/scripts/*.json
-.claude/settings.local.json
+skills/bill-analyzer/scripts/*.json
+settings.local.json
 __pycache__/

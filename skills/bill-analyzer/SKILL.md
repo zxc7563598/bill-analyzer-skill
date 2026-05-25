@@ -26,7 +26,7 @@ scripts/
 用户确认已将账单文件放入 `input/` 目录后，运行：
 
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/parse_bill.py input/ -o /tmp/cleaned_data.json
+python3 skills/bill-analyzer/scripts/parse_bill.py input/ -o /tmp/cleaned_data.json
 ```
 
 脚本自动完成：
@@ -44,7 +44,7 @@ python3 .claude/skills/bill-analyzer/scripts/parse_bill.py input/ -o /tmp/cleane
 ### Step 2: 全维度分析
 
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/analyze_bill.py /tmp/cleaned_data.json
+python3 skills/bill-analyzer/scripts/analyze_bill.py /tmp/cleaned_data.json
 ```
 
 输出 Markdown 报告，包含：
@@ -65,34 +65,34 @@ python3 .claude/skills/bill-analyzer/scripts/analyze_bill.py /tmp/cleaned_data.j
 用户可能会问特定问题（"我上个月在餐饮上花了多少钱？""蜜雪冰城去了几次？""今年每个月的交通支出趋势？"），此时用 `query_bill.py` 直接查询，无需再走完整分析流程：
 
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json [选项]
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json [选项]
 ```
 
 **常用查询模式**：
 
 查看特定商户的消费明细：
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --merchant 蜜雪冰城
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --merchant 蜜雪冰城
 ```
 
 查看某一分类的 Top N：
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --category 餐饮美食 --type expense --top 5 --group-by merchant
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --category 餐饮美食 --type expense --top 5 --group-by merchant
 ```
 
 查看某时间段的月度趋势：
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --from 2026-01 --to 2026-05 --category 交通出行 --group-by month
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --from 2026-01 --to 2026-05 --category 交通出行 --group-by month
 ```
 
 支付方式分布：
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --group-by payment --type expense
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --group-by payment --type expense
 ```
 
 关键词模糊搜索：
 ```bash
-python3 .claude/skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --keyword 房租
+python3 skills/bill-analyzer/scripts/query_bill.py /tmp/cleaned_data.json --keyword 房租
 ```
 
 **可用筛选条件**：`--type`（income/expense）、`--category`、`--merchant`、`--payment`、`--source`（alipay/wechat）、`--date-from`、`--date-to`、`--keyword`
