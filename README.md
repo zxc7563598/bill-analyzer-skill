@@ -17,18 +17,21 @@
 
 ```
 .
-├── skills/                         # 技能目录
+├── skills/bill-analyzer/           # 技能目录
 │   ├── SKILL.md                    # 技能描述与工作流指引
-│   └── scripts/
-│       ├── parse_bill.py           # 批量解析 input/ → cleaned_data.json
-│       ├── analyze_bill.py         # 全维度分析 → Markdown/JSON 报告
-│       └── query_bill.py           # 交互式查询（筛选/分组/排行）
-├── input/                          # 放置账单文件的目录
+│   ├── scripts/
+│   │   ├── parse_bill.py           # 批量解析账单 → cleaned_data.json
+│   │   ├── analyze_bill.py         # 全维度分析 → Markdown/JSON 报告
+│   │   └── query_bill.py           # 交互式查询（筛选/分组/排行）
+│   └── references/
+│       ├── merchant_clean_mapping.json   # 原始商户名 → 标准化商户名
+│       ├── category_mapping.json         # 标准化商户名 → 分类
+│       └── payment_method_mapping.json   # 原始支付方式 → 标准化支付方式
 ├── .gitignore
 └── LICENSE
 ```
 
-> 映射文件（`merchant_clean_mapping.json`、`category_mapping.json`、`payment_method_mapping.json`）会在首次解析账单时自动生成于 `scripts/` 目录下，随使用逐步完善。这些文件已加入 `.gitignore`，不会提交到仓库。
+> `references/` 下的三份映射文件初始为空模板（`{}`），首次解析账单后自动填充。这些文件随使用逐步积累个人数据，建议不要提交修改后的内容。
 
 ## 安装
 
@@ -37,46 +40,60 @@
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 已安装
 - Python 3.9+ 及 `openpyxl` 库
 
-### 步骤
-
-**方式一：通过 Claude Code 技能市场安装（推荐）**
-
-在 Claude Code 中运行：
-
-```
-/add-skill https://github.com/zxc7563598/bill-analyzer-skill
+```bash
+pip3 install openpyxl
 ```
 
-**方式二：通过 npx 安装**
+### 安装技能
+
+**方式一：项目内使用（无需额外安装）**
+
+克隆仓库后，在项目目录中使用 Claude Code 即可自动加载 `skills/bill-analyzer/`：
 
 ```bash
-npx skills add https://github.com/zxc7563598/bill-analyzer-skill --skill bill-analyzer
+git clone https://github.com/zxc7563598/bill-analyzer-skill.git
+cd bill-analyzer-skill
 ```
+
+**方式二：安装为全局技能**
+
+将技能软链到 Claude Code 的全局技能目录，在任何项目中均可使用：
+
+```bash
+ln -s $(pwd)/skills/bill-analyzer ~/.claude/skills/bill-analyzer
+```
+
+**方式三：打包为 .skill 文件分发**
+
+```bash
+python ~/.claude/skills/skill-creator/scripts/package_skill.py skills/bill-analyzer
+```
+
+生成的 `bill-analyzer.skill` 文件可分发，接收方解压到 `~/.claude/skills/` 即可使用。
 
 ## 使用
 
 ### 第一步：准备账单文件
 
-将支付宝或微信导出的账单文件放入项目根目录下的 `input/` 文件夹。
+将支付宝或微信导出的账单文件放入任意目录（如项目根目录下的 `input/`，或 `~/Downloads/`）。
 
 支持的文件格式：
 - **支付宝**：CSV 格式，自动检测编码（gbk/utf-8）
 - **微信**：XLSX 格式
 
-> 示例目录结构：
-> ```
-> input/
-> ├── 支付宝交易明细(20240701-20250630).csv
-> └── 微信支付账单流水文件(20240701-20250701).xlsx
-> ```
-
 ### 第二步：触发技能
 
-在 Claude Code 中输入 `/bill-analyzer` 或直接描述你的账单分析需求，例如：
+在 Claude Code 中输入以下指令，或直接描述你的账单分析需求：
 
-> "帮我分析一下 input/ 目录下的账单"
+```
+/bill-analyzer
+```
 
-技能会引导你确认文件已就位，然后自动完成解析和分析。
+例如：
+
+> "帮我分析一下 ~/Downloads/ 目录下的账单文件"
+
+技能会确认文件位置，然后自动完成解析和分析。
 
 ### 第三步：查看分析报告
 
@@ -105,9 +122,9 @@ npx skills add https://github.com/zxc7563598/bill-analyzer-skill --skill bill-an
 
 技能会自动调用 `query_bill.py` 精准回答，无需重新生成完整报告。
 
-## 映射文件管理
+## 映射文件说明
 
-三个映射文件存储在 `scripts/` 目录下（已 gitignore），随使用自动积累：
+三份映射文件位于 `skills/bill-analyzer/references/`，初始为空模板（`{}`），随使用自动积累：
 
 | 文件 | 作用 |
 |------|------|
